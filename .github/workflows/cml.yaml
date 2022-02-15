@@ -1,0 +1,68 @@
+name: projetA62
+on:
+  push:
+    branches:
+      - main
+      #- CML_plus_dvc 
+jobs:
+  CI_generate_model:
+    runs-on: ubuntu-latest
+    container: docker://dvcorg/cml-py3:latest
+    steps:
+      - uses: actions/checkout@v2
+                    
+      - name: upload data
+        env:
+          GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
+        run: |
+          dvc pull model
+          ls -lrt model/
+      
+      - name: generate model and modele.md
+        run: |
+          echo "# Metriques:" > modele.md
+
+         
+      - name: preparer_gitpush
+        run: |
+          git config --local user.email "$GITHUB_EMAIL"
+          git config --local user.name "$GITHUB_USERNAME"
+
+
+          #git add requirements_docker.txt python_version.txt report.md
+          git add modele.md model.dvc
+
+          echo $(date +%Z)
+          git commit --allow-empty -m "push model.dvc and report at $(date +%d-%b-%H_%M)"
+          
+          ################ ici attetion, changer la verions  #################
+          
+          #git tag -a "v2.3.1" -m "generate model in github, $(date +%Z), at $(date +%d-%b-%Y--%H_%M)"
+          #git tag -a "v2.3.1" -m "generate model in github, $(date +%Z), at $(date +"%D--%T")"
+          git tag -a "v2.3.1" -m "generate model in github, $(date +%Z), at $(date +%d-%b-%Y--%H:%M:%S)"
+          
+           
+          #######################################################################################
+          
+          git push --follow-tags
+
+          #################################
+          # creer dossier app, add origin 2 et push model.dvc vers origin 2
+          git remote add origin2 git@github.com:kbenmus02/tester_origin2_get_code.git
+          git add model.dvc 
+          echo $(date +%Z)
+          git commit --allow-empty -m "update model.dvc and report at $(date +%d-%b-%H_%M)"
+          
+          git push --set-upstream origin2 develop
+
+        env:
+          GITHUB_USERNAME: "$GITHUB_USERNAME"
+          GITHUB_EMAIL: "$GITHUB_EMAIL"
+
+
+
+
+
+          
+                    
+        
