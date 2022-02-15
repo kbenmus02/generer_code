@@ -53,7 +53,8 @@ jobs:
           echo $(date +%Z)
           git commit --allow-empty -m "update model.dvc and report at $(date +%d-%b-%H_%M)"
           
-          git push --set-upstream origin2 -b develop
+          #git push --set-upstream origin2 develop
+          git push -u origin2 develop
 
         env:
           GITHUB_USERNAME: "$GITHUB_USERNAME"
